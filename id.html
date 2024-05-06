@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Покупка книги</title>
+</head>
+<body>
+    <input type="text" id="bookInput" placeholder="Введите название книги">
+    <button onclick="searchBooks()">Поиск</button>
+    <div id="results"></div>
+    <div id="purchaseForm" style="display: none;">
+        <h2>Оформление заказа</h2>
+        <form method="post" action="https://script.google.com/macros/s/AKfycbxLJVghjEGXxkg7AFOX21Ixvia0jCUETjzO85DYFOcxN_zTl0gVio-ViTwcP5qGRO5oiQ/exec" name="contact-form">
+        <input type="text" name="nameInput" placeholder="Имя">
+        <input type="email" name="emailInput" placeholder="Email">
+        <input type="tel" name="phoneInput" placeholder="Телефон">
+        <input type="text" name="addressInput" placeholder="Адрес">
+        <div name = "bookTitle"></div>
+        <div name = "bookAuthor"></div>
+        <input type="submit" value="Submit" id="submit">
+    </form>
+    </div>
+
+    <script>
+        function searchBooks() {
+            var searchTerm = document.getElementById('bookInput').value;
+            // Отправить запрос к Google Books API
+            fetch(`https://www.googleapis.com/books/v1/volumes?q=${searchTerm}`)
+                .then(response => response.json())
+                .then(data => {
+                    displayResults(data.items);
+                })
+                .catch(error => console.error('Ошибка:', error));
+        }
+
+        function displayResults(books) {
+            var resultsContainer = document.getElementById('results');
+            resultsContainer.innerHTML = '';
+            books.forEach(function(book) {
+                var bookDiv = document.createElement('div');
+                var title = book.volumeInfo.title;
+                var author = book.volumeInfo.authors ? book.volumeInfo.authors[0] : 'Unknown';
+                bookDiv.innerHTML = '<p>' + title + ' - ' + author + '</p>' +
+                                    '<button onclick="showPurchaseForm(\'' + title + '\', \'' + author + '\')">Купить</button>';
+                resultsContainer.appendChild(bookDiv);
+            });
+        }
+
+        function showPurchaseForm(title, author) {
+            document.getElementById('purchaseForm').style.display = 'block';
+            document.getElementById('bookTitle').value = title;
+            document.getElementById('bookAuthor').value = author;
+        }
+
+    </script>
+	<script src="gsheet.js"></script>
+</body>
+</html>
